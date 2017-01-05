@@ -32,13 +32,15 @@ export class NgCliWebpackConfig {
     vendorChunk = false,
     verbose = false,
     progress = true,
-    deployUrl?: string
+    deployUrl?: string,
+    webpackTarget?: string
   ) {
     const config: CliConfig = CliConfig.fromProject();
     const appConfig = config.config.apps[0];
 
     appConfig.outDir = outputDir || appConfig.outDir;
     appConfig.deployUrl = deployUrl || appConfig.deployUrl;
+    appConfig.webpackTarget = webpackTarget || appConfig.webpackTarget;
 
     let baseConfig = getWebpackCommonConfig(
       this.ngCliProject.root,

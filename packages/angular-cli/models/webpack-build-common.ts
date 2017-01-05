@@ -195,6 +195,7 @@ export function getWebpackCommonConfig(
       module: false,
       clearImmediate: false,
       setImmediate: false
-    }
+    },
+    target: appConfig.webpackTarget
   };
 }

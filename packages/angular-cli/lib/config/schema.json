@@ -114,6 +114,10 @@
             "description": "Name and corresponding file for environment config.",
             "type": "object",
             "additionalProperties": true
+          },
+          "webpackTarget": {
+            "description": "To specify the target property of webpack config.",
+            "type": "string"
           }
         },
         "additionalProperties": false
