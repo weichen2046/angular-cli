@@ -26,14 +26,15 @@ export function updateTsConfig(fn: (json: any) => any | void) {
 
 export function ngServe(...args: string[]) {
   return silentExecAndWaitForOutputToMatch('ng',
-    ['serve', '--no-progress', ...args], /webpack: bundle is now VALID/);
+    ['serve', '--no-progress', ...args],
+    /webpack: bundle is now VALID|webpack: Compiled successfully./);
 }
 
 
 export function createProject(name: string, ...args: string[]) {
   return Promise.resolve()
     .then(() => process.chdir(getGlobalVariable('tmp-root')))
-    .then(() => ng('new', name, '--skip-npm', ...args))
+    .then(() => ng('new', name, '--skip-install', ...args))
     .then(() => process.chdir(name))
     .then(() => updateJsonFile('package.json', json => {
       Object.keys(packages).forEach(pkgName => {
@@ -50,6 +51,9 @@ export function createProject(name: string, ...args: string[]) {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['dependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });
@@ -58,6 +62,9 @@ export function createProject(name: string, ...args: string[]) {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['devDependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });

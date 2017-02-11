@@ -1,3 +1,5 @@
+<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+
 # ng generate component
 
 ## Overview
@@ -19,3 +21,7 @@
 `--change-detection` (`-cd`) set the change detection strategy
 
 `--skip-import` allows for skipping the module import
+
+`--module` (`-m`) allows specification of the declaring module
+
+`--export` specifies if declaring module exports the component

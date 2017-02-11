@@ -30,7 +30,7 @@ export class TypeScriptFileRefactor {
   private _sourceFile: ts.SourceFile;
   private _sourceString: any;
   private _sourceText: string;
-  private _changed: boolean = false;
+  private _changed = false;
 
   get fileName() { return this._fileName; }
   get sourceFile() { return this._sourceFile; }
@@ -60,12 +60,15 @@ export class TypeScriptFileRefactor {
     if (!this._program) {
       return [];
     }
-    let diagnostics: ts.Diagnostic[] = this._program.getSyntacticDiagnostics(this._sourceFile)
-                              .concat(this._program.getSemanticDiagnostics(this._sourceFile));
+    let diagnostics: ts.Diagnostic[] = [];
     // only concat the declaration diagnostics if the tsconfig config sets it to true.
     if (this._program.getCompilerOptions().declaration == true) {
       diagnostics = diagnostics.concat(this._program.getDeclarationDiagnostics(this._sourceFile));
     }
+    diagnostics = diagnostics.concat(
+      this._program.getSyntacticDiagnostics(this._sourceFile),
+      this._program.getSemanticDiagnostics(this._sourceFile));
+
     return diagnostics;
   }
 
@@ -117,8 +120,19 @@ export class TypeScriptFileRefactor {
     return arr;
   }
 
+  findFirstAstNode(node: ts.Node | null, kind: ts.SyntaxKind): ts.Node | null {
+    return this.findAstNodes(node, kind, false, 1)[0] || null;
+  }
+
   appendAfter(node: ts.Node, text: string): void {
-    this._sourceString.insertRight(node.getEnd(), text);
+    this._sourceString.appendRight(node.getEnd(), text);
+  }
+  append(node: ts.Node, text: string): void {
+    this._sourceString.appendLeft(node.getEnd(), text);
+  }
+
+  prependBefore(node: ts.Node, text: string) {
+    this._sourceString.appendLeft(node.getStart(), text);
   }
 
   insertImport(symbolName: string, modulePath: string): void {
@@ -170,7 +184,7 @@ export class TypeScriptFileRefactor {
   }
 
   removeNodes(...nodes: ts.Node[]) {
-    nodes.forEach(node => this.removeNode(node));
+    nodes.forEach(node => node && this.removeNode(node));
   }
 
   replaceNode(node: ts.Node, replacement: string) {

@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 var path = require('path');
 var tmp = require('../helpers/tmp');
 var root = process.cwd();
-var Promise = require('angular-cli/ember-cli/lib/ext/promise');
+var Promise = require('@angular/cli/ember-cli/lib/ext/promise');
 var SilentError = require('silent-error');
 const denodeify = require('denodeify');
 
@@ -20,7 +20,7 @@ describe('Acceptance: ng generate component', function () {
     return tmp.setup('./tmp').then(function () {
       process.chdir('./tmp');
     }).then(function () {
-      return ng(['new', 'foo', '--skip-npm']);
+      return ng(['new', 'foo', '--skip-install']);
     });
   });
 
@@ -175,6 +175,20 @@ describe('Acceptance: ng generate component', function () {
       .then(() => {
         var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.ts');
         expect(existsSync(testPath)).to.equal(true);
+      });
+  });
+
+  it(`non${path.sep}existing${path.sep}dir${path.sep}myComp will create dir and succeed`, () => {
+    const testPath =
+      path.join(root, 'tmp', 'foo', 'src', 'app', 'non', 'existing', 'dir', 'my-comp', 'my-comp.component.ts');
+    const appModule = path.join(root, 'tmp', 'foo', 'src', 'app', 'app.module.ts');
+    return ng(['generate', 'component', `non${path.sep}existing${path.sep}dir${path.sep}myComp`])
+      .then(() => expect(existsSync(testPath)).to.equal(true))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        // Expect that the app.module contains a reference to my-comp and its import.
+        expect(content)
+          .matches(/import.*MyCompComponent.*from '.\/non\/existing\/dir\/my-comp\/my-comp.component';/);
       });
   });
 

@@ -1,6 +1,5 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
-import {isMobileTest} from '../utils/utils';
 import {expectFileToExist} from '../utils/fs';
 import {updateTsConfig, updateJsonFile} from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
@@ -25,7 +24,7 @@ export default function() {
   } else {
     // Otherwise create a project from scratch.
     createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-npm', isMobileTest() ? '--mobile' : undefined))
+      .then(() => ng('new', 'test-project', '--skip-install', ...(argv['ng4'] ? ['--ng4'] : [])))
       .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
       .then(() => process.chdir('./test-project'));
   }
@@ -38,7 +37,7 @@ export default function() {
       });
     }))
     .then(() => {
-      if (argv.nightly || argv['ng-sha']) {
+      if (argv['nightly'] || argv['ng-sha']) {
         const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
         return updateJsonFile('package.json', json => {
           // Install over the project with nightly builds.
@@ -46,6 +45,9 @@ export default function() {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['dependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });
@@ -54,6 +56,9 @@ export default function() {
             .filter(name => name.match(/^@angular\//))
             .forEach(name => {
               const pkgName = name.split(/\//)[1];
+              if (pkgName == 'cli') {
+                return;
+              }
               json['devDependencies'][`@angular/${pkgName}`]
                 = `github:angular/${pkgName}-builds${label}`;
             });

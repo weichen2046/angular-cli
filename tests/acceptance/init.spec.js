@@ -4,10 +4,10 @@ var ng = require('../helpers/ng');
 var expect = require('chai').expect;
 var walkSync = require('walk-sync');
 var glob = require('glob');
-var Blueprint = require('angular-cli/ember-cli/lib/models/blueprint');
+var Blueprint = require('@angular/cli/ember-cli/lib/models/blueprint');
 var path = require('path');
 var tmp = require('../helpers/tmp');
-var root = path.join(__dirname, '../../packages/angular-cli');
+var root = path.join(__dirname, '../../packages/@angular/cli');
 var util = require('util');
 var minimatch = require('minimatch');
 var intersect = require('lodash/intersection');
@@ -20,7 +20,7 @@ var existsSync = require('exists-sync');
 
 var defaultIgnoredFiles = Blueprint.ignoredFiles;
 
-describe('Acceptance: ng init', function () {
+describe('Acceptance: ng update', function () {
   this.timeout(20000);
 
   beforeEach(function () {
@@ -36,11 +36,10 @@ describe('Acceptance: ng init', function () {
     return tmp.teardown('./tmp');
   });
 
-  function confirmBlueprinted(isMobile, routing) {
+  function confirmBlueprinted(routing) {
     routing = !!routing;
     var blueprintPath = path.join(root,  'blueprints', 'ng2', 'files');
-    var mobileBlueprintPath = path.join(root, 'blueprints', 'mobile', 'files');
-    var expected = unique(walkSync(blueprintPath).concat(isMobile ? walkSync(mobileBlueprintPath) : []).sort());
+    var expected = unique(walkSync(blueprintPath).sort());
     var actual = walkSync('.').sort();
 
     forEach(Blueprint.renamedFiles, function (destFile, srcFile) {
@@ -52,11 +51,6 @@ describe('Acceptance: ng init', function () {
       expected[index] = expected[index].replace(/__styleext__/g, 'css');
       expected[index] = expected[index].replace(/__path__/g, 'src');
     });
-
-    if (isMobile) {
-      expected = expected.filter(p => p.indexOf('app.component.html') < 0);
-      expected = expected.filter(p => p.indexOf('app.component.css') < 0);
-    }
 
     if (!routing) {
       expected = expected.filter(p => p.indexOf('app-routing.module.ts') < 0);
@@ -100,18 +94,14 @@ describe('Acceptance: ng init', function () {
     });
   }
 
-  it('ng init', function () {
+  it('ng init does the same as ng update', function () {
     return ng([
       'init',
-      '--skip-npm'
+      '--skip-install'
     ]).then(confirmBlueprinted);
   });
 
-  it('ng init with mobile flag does throw exception', function () {
-    expect(ng(['init', '--mobile'])).to.throw;
-  });
-
-  it('ng init can run in created folder', function () {
+  it('ng update can run in created folder', function () {
     return tmp.setup('./tmp/foo')
       .then(function () {
         process.chdir('./tmp/foo');
@@ -119,7 +109,7 @@ describe('Acceptance: ng init', function () {
       .then(function () {
         return ng([
           'init',
-          '--skip-npm',
+          '--skip-install',
           '--name',
           'tmp'
         ]);
@@ -131,15 +121,15 @@ describe('Acceptance: ng init', function () {
   });
 
   it('init an already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', '--skip-npm']);
+        return ng(['init', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init a single file', function () {
-    return ng(['init', 'package.json', '--skip-npm'])
+    return ng(['init', 'package.json', '--skip-install'])
       .then(function () {
         return 'package.json';
       })
@@ -147,15 +137,15 @@ describe('Acceptance: ng init', function () {
   });
 
   it('init a single file on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'package.json', '--skip-npm']);
+        return ng(['init', 'package.json', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init multiple files by glob pattern', function () {
-    return ng(['init', 'src/**', '--skip-npm'])
+    return ng(['init', 'src/**', '--skip-install'])
       .then(function () {
         return 'src/**';
       })
@@ -163,15 +153,15 @@ describe('Acceptance: ng init', function () {
   });
 
   it('init multiple files by glob pattern on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'src/**', '--skip-npm']);
+        return ng(['init', 'src/**', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
   it('init multiple files by glob patterns', function () {
-    return ng(['init', 'src/**', 'package.json', '--skip-npm'])
+    return ng(['init', 'src/**', 'package.json', '--skip-install'])
       .then(function () {
         return '{src/**,package.json}';
       })
@@ -179,26 +169,35 @@ describe('Acceptance: ng init', function () {
   });
 
   it('init multiple files by glob patterns on already init\'d folder', function () {
-    return ng(['init', '--skip-npm'])
+    return ng(['init', '--skip-install'])
       .then(function () {
-        return ng(['init', 'src/**', 'package.json', '--skip-npm']);
+        return ng(['init', 'src/**', 'package.json', '--skip-install']);
       })
       .then(confirmBlueprinted);
   });
 
-  it('ng init --inline-template does not generate a template file', () => {
-    return ng(['init', '--skip-npm', '--skip-git', '--inline-template'])
+  it('ng update --inline-template does not generate a template file', () => {
+    return ng(['init', '--skip-install', '--skip-git', '--inline-template'])
       .then(() => {
         const templateFile = path.join('src', 'app', 'app.component.html');
         expect(existsSync(templateFile)).to.equal(false);
       });
   });
 
-  it('ng init --inline-style does not gener a style file', () => {
-    return ng(['init', '--skip-npm', '--skip-git', '--inline-style'])
+  it('ng update --inline-style does not gener a style file', () => {
+    return ng(['init', '--skip-install', '--skip-git', '--inline-style'])
       .then(() => {
         const styleFile = path.join('src', 'app', 'app.component.css');
         expect(existsSync(styleFile)).to.equal(false);
       });
   });
+
+  it('should skip spec files when passed --skip-tests', () => {
+    return ng(['init', '--skip-install', '--skip-git', '--skip-tests'])
+      .then(() => {
+        const specFile = path.join('src', 'app', 'app.component.spec.ts');
+        expect(existsSync(specFile)).to.equal(false);
+      });
+  });
+
 });

@@ -9,8 +9,11 @@
     "noImplicitAny": true,
     "outDir": "../../../dist/@ngtools/logger",
     "rootDir": ".",
-    "lib": ["es2015", "es6", "dom"],
-    "target": "es5",
+    "lib": [
+      "es2016",
+      "dom"
+    ],
+    "target": "es6",
     "sourceMap": true,
     "sourceRoot": "/",
     "baseUrl": ".",
