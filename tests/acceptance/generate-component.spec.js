@@ -42,6 +42,16 @@ describe('Acceptance: ng generate component', function () {
       });
   });
 
+  it('generating my-comp twice does not add two declarations to module', function () {
+    const appModule = path.join(root, 'tmp/foo/src/app/app.module.ts');
+    return ng(['generate', 'component', 'my-comp'])
+      .then(() => ng(['generate', 'component', 'my-comp']))
+      .then(() => readFile(appModule, 'utf-8'))
+      .then(content => {
+        expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+MyCompComponent\r?\n\s+\]/m);
+      });
+  });
+
   it('test' + path.sep + 'my-comp', function () {
     fs.mkdirsSync(path.join(root, 'tmp', 'foo', 'src', 'app', 'test'));
     return ng(['generate', 'component', 'test' + path.sep + 'my-comp']).then(() => {
@@ -206,10 +216,103 @@ describe('Acceptance: ng generate component', function () {
     });
   });
 
-  it('my-comp --no-spec', function() {
+  it('my-comp --no-spec', function () {
     return ng(['generate', 'component', 'my-comp', '--no-spec']).then(() => {
       var testPath = path.join(root, 'tmp', 'foo', 'src', 'app', 'my-comp', 'my-comp.component.spec.ts');
       expect(existsSync(testPath)).to.equal(false);
+    });
+  });
+
+  it('should error out when given an incorrect module path', () => {
+    return Promise.resolve()
+      .then(() => ng(['generate', 'component', 'baz', '--module', 'foo']))
+      .catch((error) => {
+        expect(error).to.equal('Specified module does not exist');
+      })
+  });
+
+  describe('should import and add to declaration list', () => {
+    it('when given a root level module with module.ts suffix', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/app.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'component', 'baz', '--module', 'app.module.ts']))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+BazComponent\r?\n\s+\]/m);
+        });
+    });
+
+    it('when given a root level module with missing module.ts suffix', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/app.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'component', 'baz', '--module', 'app']))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[\r?\n\s+AppComponent,\r?\n\s+BazComponent\r?\n\s+\]/m);
+        });
+    });
+
+    it('when given a submodule with module.ts suffix', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo/foo.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'foo']))
+        .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'foo.module.ts')]))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[BazComponent]/m);
+        });
+    });
+
+    it('when given a submodule with missing module.ts suffix', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo/foo.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'foo']))
+        .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'foo')]))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[BazComponent]/m);
+        });
+    });
+
+    it('when given a submodule folder', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo/foo.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'foo']))
+        .then(() => ng(['generate', 'component', 'baz', '--module', 'foo']))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/..\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[BazComponent]/m);
+        });
+    });
+
+    it('when given deep submodule folder with missing module.ts suffix', () => {
+      const appRoot = path.join(root, 'tmp/foo');
+      const modulePath = path.join(appRoot, 'src/app/foo/bar/bar.module.ts');
+
+      return Promise.resolve()
+        .then(() => ng(['generate', 'module', 'foo']))
+        .then(() => ng(['generate', 'module', path.join('foo', 'bar')]))
+        .then(() => ng(['generate', 'component', 'baz', '--module', path.join('foo', 'bar')]))
+        .then(() => readFile(modulePath, 'utf-8'))
+        .then(content => {
+          expect(content).matches(/import.*BazComponent.*from '.\/..\/..\/baz\/baz.component';/);
+          expect(content).matches(/declarations:\s+\[BazComponent]/m);
+        });
     });
   });
 });

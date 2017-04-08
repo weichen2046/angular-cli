@@ -3,59 +3,271 @@
 # ng serve
 
 ## Overview
-`ng serve` builds the application and starts a web server
+`ng serve` builds the application and starts a web server.
+
+All the build Options are available in serve, below are the additional options.
 
 ## Options
-`--port` (`-p`) port to serve the application on
+<details>
+  <summary>host</summary>
+  <p>
+    <code>--host</code> (aliases: <code>-H</code>) <em>default value: localhost</em>
+  </p>
+  <p>
+    Listens only on localhost by default.
+  </p>
+</details>
 
-`--host` (`-H`) host where to listen
+<details>
+  <summary>hmr</summary>
+  <p>
+    <code>--hmr</code> <em>default value: false</em>
+  </p>
+  <p>
+    Enable hot module replacement.
+  </p>
+</details>
 
-`--proxy-config` (`-pc`) proxy configuration file
+<details>
+  <summary>live-reload</summary>
+  <p>
+    <code>--live-reload</code> (aliases: <code>-lr</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Whether to reload the page on change, using live-reload.
+  </p>
+</details>
 
-`--live-reload` (`-lr`) flag to turn off live reloading
+<details>
+  <summary>live-reload-client</summary>
+  <p>
+    <code>--live-reload-client</code>
+  </p>
+  <p>
+    Specify the URL that the live reload browser client will use.
+  </p>
+</details>
 
-`--live-reload-host` (`-lrh`) specify the host for live reloading
+<details>
+  <summary>open</summary>
+  <p>
+    <code>--open</code> (aliases: <code>-o</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Opens the url in default browser.
+  </p>
+</details>
 
-`--live-reload-base-url` (`-lrbu`) specify the base URL for live reloading
+<details>
+  <summary>port</summary>
+  <p>
+    <code>--port</code> (aliases: <code>-p</code>) <em>default value: 4200</em>
+  </p>
+  <p>
+    Port to listen to for serving.
+  </p>
+</details>
 
-`--live-reload-port` (`-lrp`) port for live reloading
+<details>
+  <summary>ssl</summary>
+  <p>
+    <code>--ssl</code>
+  </p>
+  <p>
+    Serve using HTTPS.
+  </p>
+</details>
 
-`--live-reload-live-css` flag to live reload CSS
+<details>
+  <summary>ssl-cert</summary>
+  <p>
+    <code>--ssl-cert</code> (aliases: <code>-</code>) <em>default value: </em>
+  </p>
+  <p>
+    SSL certificate to use for serving HTTPS.
+  </p>
+</details>
 
-`--ssl` flag to turn on SSL
+<details>
+  <summary>ssl-key</summary>
+  <p>
+    <code>--ssl-key</code>
+  </p>
+  <p>
+    SSL key to use for serving HTTPS.
+  </p>
+</details>
 
-`--ssl-key` path to the SSL key
+<details>
+  <summary>aot</summary>
+  <p>
+    <code>--aot</code>
+  </p>
+  <p>
+    Build using Ahead of Time compilation.
+  </p>
+</details>
 
-`--ssl-cert` path to the SSL cert
+<details>
+  <summary>base-href</summary>
+  <p>
+    <code>--base-href</code> (aliases: <code>-bh</code>)
+  </p>
+  <p>
+    Base url for the application being built.
+  </p>
+</details>
 
-`--open` (`-o`) opens the app in the default browser
+<details>
+  <summary>deploy-url</summary>
+  <p>
+    <code>--deploy-url</code> (aliases: <code>-d</code>)
+  </p>
+  <p>
+    URL where files will be deployed.
+  </p>
+</details>
 
-`--hmr` use hot module reload
+<details>
+  <summary>environment</summary>
+  <p>
+    <code>--environment</code> (aliases: <code>-e</code>)
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
 
-`--target` (`-t`) define the build target
+<details>
+  <summary>extract-css</summary>
+  <p>
+    <code>--extract-css</code> (aliases: <code>-ec</code>)
+  </p>
+  <p>
+    Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
 
-`--environment` (`-e`) defines the build environment
+<details>
+  <summary>i18n-file</summary>
+  <p>
+    <code>--i18n-file</code>
+  </p>
+  <p>
+    Localization file to use for i18n.
+  </p>
+</details>
 
-`--prod` flag to set build target and environment to production
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    <code>--i18n-format</code>
+  </p>
+  <p>
+    Format of the localization file specified with --i18n-file.
+  </p>
+</details>
 
-`--dev` flag to set build target and environment to development
+<details>
+  <summary>locale</summary>
+  <p>
+    <code>--locale</code>
+  </p>
+  <p>
+    Locale to use for i18n.
+  </p>
+</details>
 
-`--output-path` (`-po`) path where output will be placed
+<details>
+  <summary>output-hashing</summary>
+  <p>
+    <code>--output-hashing</code> (aliases: <code>-oh</code>) <em>default value: </em>
+  </p>
+  <p>
+    Define the output filename cache-busting hashing mode. Possible values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
+  </p>
+</details>
 
-`--aot` flag whether to build using Ahead of Time compilation
+<details>
+  <summary>output-path</summary>
+  <p>
+    <code>--output-path</code> (aliases: <code>-op</code>) <em>default value: </em>
+  </p>
+  <p>
+    Path where output will be placed.
+  </p>
+</details>
 
-`--sourcemap` (`-sm`) output sourcemaps
+<details>
+  <summary>poll</summary>
+  <p>
+    <code>--poll</code>
+  </p>
+  <p>
+    Enable and define the file watching poll time period (milliseconds) .
+  </p>
+</details>
 
-`--vendor-chunk` (`-vb`) use a separate bundle containing only vendor libraries
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
 
-`--base-href` (`-bh`) base url for the application being built
+<details>
+  <summary>sourcemap</summary>
+  <p>
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
 
-`--deploy-url` (`-d`) url where files will be deployed
+<details>
+  <summary>target</summary>
+  <p>
+    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
+  </p>
+  <p>
+    Defines the build target.
+  </p>
+</details>
 
-`--verbose` (`-v`) adds more details to output logging
+<details>
+  <summary>vendor-chunk</summary>
+  <p>
+    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Use a separate bundle containing only vendor libraries.
+  </p>
+</details>
 
-`--progress` (`-pr`) log progress to the console while building
+<details>
+  <summary>verbose</summary>
+  <p>
+    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
 
-`--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
+<details>
+  <summary>watch</summary>
+  <p>
+    <code>--watch</code> (aliases: <code>-w</code>)
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>
 
-`--output-hashing` define the output filename cache-busting hashing mode
+
+## Note
+When running `ng serve`, the compiled output is served from memory, not from disk. This means that the application being served is not located on disk in the `dist` folder.

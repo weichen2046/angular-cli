@@ -19,11 +19,11 @@ The build artifacts will be stored in the `dist/` directory.
 environment file to be used with that build (`--environment=dev` or `--environment=prod`).
 By default, the development build target and environment are used.
 
-The mapping used to determine which environment file is used can be found in `angular-cli.json`:
+The mapping used to determine which environment file is used can be found in `.angular-cli.json`:
 
 ```json
+"environmentSource": "environments/environment.ts",
 "environments": {
-  "source": "environments/environment.ts",
   "dev": "environments/environment.ts",
   "prod": "environments/environment.prod.ts"
 }
@@ -46,7 +46,7 @@ ng build
 
 You can also add your own env files other than `dev` and `prod` by doing the following:
 - create a `src/environments/environment.NAME.ts`
-- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `angular-cli.json`
+- add `{ "NAME": 'src/environments/environment.NAME.ts' }` to the `apps[0].environments` object in `.angular-cli.json`
 - use them via the `--env=NAME` flag on the build/serve commands.
 
 ### Base tag handling in index.html
@@ -65,32 +65,205 @@ All builds make use of bundling, and using the `--prod` flag in  `ng build --pro
 or `ng serve --prod` will also make use of uglifying and tree-shaking functionality.
 
 ## Options
-`--watch` (`-w`) flag to run builds when files change
+<details>
+  <summary>aot</summary>
+  <p>
+    <code>--aot</code> <em>default value: false</em>
+  </p>
+  <p>
+    Build using Ahead of Time compilation.
+  </p>
+</details>
 
-`--target` (`-t`) define the build target
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>)
+  </p>
+  <p>
+    Specifies app name or index to use.
+  </p>
+</details>
 
-`--environment` (`-e`) defines the build environment
+<details>
+  <summary>base-href</summary>
+  <p>
+    <code>--base-href</code> (aliases: <code>-bh</code>)
+  </p>
+  <p>
+    Base url for the application being built.
+  </p>
+</details>
 
-`--prod` flag to set build target and environment to production
+<details>
+  <summary>deploy-url</summary>
+  <p>
+    <code>--deploy-url</code> (aliases: <code>-d</code>)
+  </p>
+  <p>
+    URL where files will be deployed.
+  </p>
+</details>
 
-`--dev` flag to set build target and environment to development
+<details>
+  <summary>output-path</summary>
+  <p>
+    <code>--output-path</code> (aliases: <code>-op</code>)
+  </p>
+  <p>
+    Path where output will be placed
+  </p>
+</details>
 
-`--output-path` (`-po`) path where output will be placed
+<details>
+  <summary>environment</summary>
+  <p>
+    <code>--environment</code> (aliases: <code>-e</code>)
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
 
-`--aot` flag whether to build using Ahead of Time compilation
+<details>
+  <summary>extract-css</summary>
+  <p>
+    <code>--extract-css</code> (aliases: <code>-ec</code>)
+  </p>
+  <p>
+    Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
 
-`--sourcemap` (`-sm`) output sourcemaps
+<details>
+  <summary>i18n-file</summary>
+  <p>
+    <code>--i18n-file</code>
+  </p>
+  <p>
+    Localization file to use for i18n.
+  </p>
+</details>
 
-`--vendor-chunk` (`-vb`) use a separate bundle containing only vendor libraries
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    <code>--i18n-format</code>
+  </p>
+  <p>
+    Format of the localization file specified with --i18n-file.
+  </p>
+</details>
 
-`--base-href` (`-bh`) base url for the application being built
+<details>
+  <summary>locale</summary>
+  <p>
+    <code>--locale</code>
+  </p>
+  <p>
+    Locale to use for i18n.
+  </p>
+</details>
 
-`--deploy-url` (`-d`) url where files will be deployed
+<details>
+  <summary>output-hashing</summary>
+  <p>
+    <code>--output-hashing</code> (aliases: <code>-oh</code>)
+  </p>
+  <p>
+    Define the output filename cache-busting hashing mode.
+  </p>
+  <p>
+    Values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
+  </p>
+</details>
 
-`--verbose` (`-v`) adds more details to output logging
+<details>
+  <summary>output-path</summary>
+  <p>
+    <code>--output-path</code> (aliases: <code>-op</code>)
+  </p>
+  <p>
+    Path where output will be placed.
+  </p>
+</details>
 
-`--progress` (`-pr`) log progress to the console while building
+<details>
+  <summary>poll</summary>
+  <p>
+    <code>--poll</code>
+  </p>
+  <p>
+    Enable and define the file watching poll time period (milliseconds).
+  </p>
+</details>
 
-`--extract-css` (`-ec`) extract css from global styles onto css files instead of js ones
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true</<em>
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
 
-`--output-hashing` define the output filename cache-busting hashing mode
+<details>
+  <summary>sourcemap</summary>
+  <p>
+    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
+
+<details>
+  <summary>stats-json</summary>
+  <p>
+    <code>--stats-json</code>
+  </p>
+  <p>
+    Generates a <code>stats.json</code> file which can be analyzed using tools such as: <code>webpack-bundle-analyzer</code> or https://webpack.github.io/analyse.
+  </p>
+</details>
+
+<details>
+  <summary>target</summary>
+  <p>
+    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
+  </p>
+  <p>
+    Defines the build target.
+  </p>
+</details>
+
+<details>
+  <summary>vendor-chunk</summary>
+  <p>
+    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
+  </p>
+  <p>
+    Use a separate bundle containing only vendor libraries.
+  </p>
+</details>
+
+<details>
+  <summary>verbose</summary>
+  <p>
+    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
+  </p>
+  <p>
+    Adds more details to output logging.
+  </p>
+</details>
+
+<details>
+  <summary>watch</summary>
+  <p>
+    <code>--watch</code> (aliases: <code>-w</code>)
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>

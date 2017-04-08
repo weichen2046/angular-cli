@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { oneLine, stripIndent } from 'common-tags';
+import { stripIndent } from 'common-tags';
 
 const stringUtils = require('ember-cli-string-utils');
 const Command = require('../ember-cli/lib/models/command');
 const lookupCommand = require('../ember-cli/lib/cli/lookup-command');
 
-function extractOptions(opts: any): String {
-  const output: String[] = [];
+function extractOptions(opts: any): string[] {
+  const output: string[] = [];
 
   for (let index = 0; index < opts.length; index++) {
     const element = opts[index];
@@ -18,38 +18,67 @@ function extractOptions(opts: any): String {
     }
   }
 
-  return output.sort().join(' ');
+  return output;
+}
+
+function extractBlueprints(opts: any): string[] {
+  const output: string[] = [];
+
+  for (let index = 0; index < opts.length; index++) {
+    const element = opts[index];
+    output.push(element.name);
+  }
+
+  return output;
 }
 
 export interface CompletionCommandOptions {
   all?: boolean;
   bash?: boolean;
   zsh?: boolean;
-};
+}
 
 const commandsToIgnore = [
-  'easter-egg',
   'destroy',
-  'github-pages-deploy' // errors because there is no base github-pages command
+  'easter-egg',
+  'init'
 ];
 
-const optsNg: String[] = [];
+const optsNg: string[] = [];
 
 const CompletionCommand = Command.extend({
   name: 'completion',
-  description: 'Adds autocomplete functionality to `ng` commands and subcommands',
+  description: 'Adds autocomplete functionality to `ng` commands and subcommands.',
   works: 'everywhere',
   availableOptions: [
-    { name: 'all',   type: Boolean, default: true,  aliases: ['a'] },
-    { name: 'bash',  type: Boolean, default: false, aliases: ['b'] },
-    { name: 'zsh',   type: Boolean, default: false, aliases: ['z'] }
+    {
+      name: 'all',
+      type: Boolean,
+      default: true,
+      aliases: ['a'],
+      description: 'Generate a completion script compatible with both bash and zsh.'
+    },
+    {
+      name: 'bash',
+      type: Boolean,
+      default: false,
+      aliases: ['b'],
+      description: 'Generate a completion script for bash.'
+    },
+    {
+      name: 'zsh',
+      type: Boolean,
+      default: false,
+      aliases: ['z'],
+      description: 'Generate a completion script for zsh.'
+    }
   ],
 
   run: function (commandOptions: CompletionCommandOptions) {
     commandOptions.all = !commandOptions.bash && !commandOptions.zsh;
 
     const commandFiles = fs.readdirSync(__dirname)
-      .filter(file => file.match(/\.ts$/) && !file.match(/\.run.ts$/))
+      .filter(file => file.match(/\.(j|t)s$/) && !file.match(/\.d.ts$/))
       .map(file => path.parse(file).name)
       .filter(file => {
         return commandsToIgnore.indexOf(file) < 0;
@@ -69,7 +98,7 @@ const CompletionCommand = Command.extend({
 
     commandFiles.forEach(cmd => {
       const Command = lookupCommand(commandMap, cmd);
-      const com: String[] = [];
+      const com: string[] = [];
 
       const command = new Command({
         ui: this.ui,
@@ -82,21 +111,27 @@ const CompletionCommand = Command.extend({
       com.push(command.name);
 
       if (command.aliases) {
-        command.aliases.forEach((element: String) => {
+        command.aliases.forEach((element: string) => {
           optsNg.push(element);
           com.push(element);
         });
       }
 
+      let opts: string[] = [];
+      if (command.blueprints && command.blueprints[0]) {
+        opts = opts.concat(extractBlueprints(command.blueprints));
+      }
+
       if (command.availableOptions && command.availableOptions[0]) {
-        let opts = extractOptions (command.availableOptions);
-        caseBlock = caseBlock + '    ' + com.sort().join('|') + ') opts="' + opts + '" ;;\n';
+        opts = opts.concat(extractOptions(command.availableOptions));
+        const optsStr = opts.sort().join(' ');
+        caseBlock = `${caseBlock}
+             ${com.sort().join('|')}) opts="${optsStr}" ;;`;
       }
     });
 
-    caseBlock = 'ng|help) opts="' + optsNg.sort().join(' ') + '" ;;\n' +
-                caseBlock +
-                '    *) opts="" ;;';
+    caseBlock = `ng|help) opts="${optsNg.sort().join(' ')}" ;;${caseBlock}
+             *) opts="" ;;`;
 
     console.log(stripIndent`
       ###-begin-ng-completion###
@@ -109,8 +144,8 @@ const CompletionCommand = Command.extend({
       #   2. Produce Bash-only completion: "ng completion -b" or "ng completion --bash".
       #   3. Produce Zsh-only completion: "ng completion -z" or "ng completion --zsh".
       #
-      # Installation: ng completion -b >> ~/.bashrc
-      #           or  ng completion -z >> ~/.zshrc
+      # Usage: . <(ng completion --bash) # place it appropriately in .bashrc or
+      #        . <(ng completion --zsh) # find a spot for it in .zshrc
       #`);
 
     if (commandOptions.all && !commandOptions.bash) {

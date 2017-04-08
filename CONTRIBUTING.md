@@ -18,7 +18,17 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-If you have questions about how to *use* Angular CLI, please direct them to [StackOverflow][stackoverflow]. Please note that Angular CLI is still in early developer preview, and the core team's capacity to answer usage questions is limited. We are also available on [Gitter][gitter].
+Please, do not open issues for the general support questions as we want to keep GitHub issues for bug reports and feature requests. You've got much better chances of getting your question answered on [StackOverflow](https://stackoverflow.com/questions/tagged/angular-cli) where the questions should be tagged with tag `angular-cli`.
+
+StackOverflow is a much better place to ask questions since:
+
+- there are thousands of people willing to help on StackOverflow
+- questions and answers stay available for public viewing so your question / answer might help someone else
+- StackOverflow's voting system assures that the best answers are prominently visible.
+
+To save your and our time we will be systematically closing all the issues that are requests for general support and redirecting people to StackOverflow.
+
+If you would like to chat about the question in real-time, you can reach out via [our gitter channel][gitter].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
@@ -40,24 +50,23 @@ and help you to craft the change so that it is successfully accepted into the pr
 ## <a name="submit"></a> Submission Guidelines
 
 ### <a name="submit-issue"></a> Submitting an Issue
-Before you submit an issue, search the archive, maybe your question was already answered.
 
-If your issue appears to be a bug, and hasn't been reported, open a new issue.
-Help us to maximize the effort we can spend fixing issues and adding new
-features, by not reporting duplicate issues.  Providing the following information will increase the
-chances of your issue being dealt with quickly:
+Before you submit an issue, please search the issue tracker, maybe an issue for your problem already exists and the discussion might inform you of workarounds readily available.
 
-* **Overview of the Issue** - if an error is being thrown a non-minified stack trace helps
-* **Angular CLI Version** - what version of the CLI is affected (e.g. 0.1.2)
-* **Motivation for or Use Case** - explain what are you trying to do and why the current behavior is a bug for you
-* **Browsers and Operating System** - is this a problem with all browsers?
-* **Reproduce the Error** - provide a live example (using [Plunker][plunker],
-  [JSFiddle][jsfiddle] or [Runnable][runnable]) or a unambiguous set of steps
-* **Related Issues** - has a similar issue been reported before?
-* **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
-  causing the problem (line of code or commit)
+We want to fix all the issues as soon as possible, but before fixing a bug we need to reproduce and confirm it. In order to reproduce bugs we will systematically ask you to provide a minimal reproduction scenario using `ng new repro-app`. Having a reproducible scenario gives us wealth of important information without going back & forth to you with additional questions like:
 
-You can file new issues by providing the above information [here](https://github.com/angular/angular-cli/issues/new).
+- version of Angular CLI used
+- `.angular-cli.json` configuration
+- 3rd-party libraries and their versions
+- and most importantly - a use-case that fails
+
+A minimal reproduce scenario using allows us to quickly confirm a bug (or point out coding problem) as well as confirm that we are fixing the right problem.
+
+We will be insisting on a minimal reproduce scenario in order to save maintainers time and ultimately be able to fix more bugs. Interestingly, from our experience users often find coding problems themselves while preparing a minimal repository. We understand that sometimes it might be hard to extract essentials bits of code from a larger code-base but we really need to isolate the problem before we can fix it.
+
+Unfortunately we are not able to investigate / fix bugs without a minimal reproduction, so if we don't hear back from you we are going to close an issue that don't have enough info to be reproduced.
+
+You can file new issues by filling out our [new issue form](https://github.com/angular/angular-cli/issues/new).
 
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
@@ -95,7 +104,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 * In GitHub, send a pull request to `angular-cli:master`.
 * If we suggest changes then:
   * Make the required updates.
-  * Re-run the Angular CLI test suites for JS and Dart to ensure tests are still passing.
+  * Re-run the Angular CLI test suites to ensure tests are still passing.
   * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
 
     ```shell
@@ -137,7 +146,7 @@ from the main (upstream) repository:
 ## <a name="rules"></a> Coding Rules
 To ensure consistency throughout the source code, keep these rules in mind as you are working:
 
-* All features or bug fixes **must be tested** by one or more specs (unit-tests).
+* All features or bug fixes **must be tested** by one or more specs (unit-tests or e2e-tests).
 * All public API methods **must be documented**. (Details TBC).
 * We follow [Google's JavaScript Style Guide][js-style-guide], but wrap all code at
   **100 characters**.
@@ -171,20 +180,32 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ### Type
 Must be one of the following:
 
+* **build**: Changes that affect the build system or external dependencies
+* **ci**: Changes to our CI configuration files and scripts
+* **docs**: Documentation only changes
 * **feat**: A new feature
 * **fix**: A bug fix
-* **docs**: Documentation only changes
+* **perf**: A code change that improves performance
+* **refactor**: A code change that neither fixes a bug nor adds a feature
 * **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing
   semi-colons, etc)
-* **refactor**: A code change that neither fixes a bug nor adds a feature
-* **perf**: A code change that improves performance
 * **test**: Adding missing tests or correcting existing tests
-* **build** Changes that affect the build system, CI configuration or external dependencies (example scopes: gulp, broccoli, npm)
-* **chore**: Other changes that don't modify `src` or `test` files
 
 ### Scope
-The scope could be anything specifying place of the commit change. For example
-`Compiler`, `ElementInjector`, etc.
+The scope should be the name of the npm package affected as perceived by the person reading changelog generated from the commit messages.
+
+The following is the list of supported scopes:
+
+* **@angular/cli**
+* **@ngtools/json-schema**
+* **@ngtools/logger**
+* **@ngtools/webpack**
+
+There are currently a few exceptions to the "use package name" rule:
+
+* **packaging**: used for changes that change the npm package layout in all of our packages, e.g. public path changes, package.json changes done to all packages, d.ts file/format changes, changes to bundles, etc.
+* **changelog**: used for updating the release notes in CHANGELOG.md
+* none/empty string: useful for `style`, `test` and `refactor` changes that are done across all packages (e.g. `style: add missing semicolons`)
 
 ### Subject
 The subject contains succinct description of the change:
@@ -218,12 +239,9 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
-[dev-doc]: https://github.com/angular/angular/blob/master/DEVELOPER.md
+[dev-doc]: https://github.com/angular/angular-cli#development-hints-for-working-on-angular-cli
 [GitHub]: https://github.com/angular/angular-cli
 [gitter]: https://gitter.im/angular/angular-cli
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
-[jsfiddle]: http://jsfiddle.net/
-[plunker]: http://plnkr.co/edit
-[runnable]: http://runnable.com/
 [stackoverflow]: http://stackoverflow.com/questions/tagged/angular-cli

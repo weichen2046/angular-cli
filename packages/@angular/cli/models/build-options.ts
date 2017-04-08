@@ -3,7 +3,7 @@ export interface BuildOptions {
   environment?: string;
   outputPath?: string;
   aot?: boolean;
-  sourcemap?: boolean;
+  sourcemaps?: boolean;
   vendorChunk?: boolean;
   baseHref?: string;
   deployUrl?: string;
@@ -13,5 +13,9 @@ export interface BuildOptions {
   i18nFormat?: string;
   locale?: string;
   extractCss?: boolean;
+  watch?: boolean;
   outputHashing?: string;
+  poll?: number;
+  app?: string;
+
 }

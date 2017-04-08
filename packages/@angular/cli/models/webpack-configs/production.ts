@@ -1,16 +1,15 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import * as fs from 'fs';
+import * as semver from 'semver';
 import { stripIndent } from 'common-tags';
 import { StaticAssetPlugin } from '../../plugins/static-asset';
 import { GlobCopyWebpackPlugin } from '../../plugins/glob-copy-webpack-plugin';
-import { CompressionPlugin } from '../../lib/webpack/compression-plugin';
 import { WebpackConfigOptions } from '../webpack-config';
 
 
 export const getProdConfig = function (wco: WebpackConfigOptions) {
   const { projectRoot, buildOptions, appConfig } = wco;
-  const appRoot = path.resolve(projectRoot, appConfig.root);
 
   let extraPlugins: any[] = [];
   let entryPoints: {[key: string]: string[]} = {};
@@ -24,7 +23,20 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       throw new Error(stripIndent`
         Your project is configured with serviceWorker = true, but @angular/service-worker
         is not installed. Run \`npm install --save-dev @angular/service-worker\`
-        and try again, or run \`ng set apps.0.serviceWorker=false\` in your angular-cli.json.
+        and try again, or run \`ng set apps.0.serviceWorker=false\` in your .angular-cli.json.
+      `);
+    }
+
+    // Read the version of @angular/service-worker and throw if it doesn't match the
+    // expected version.
+    const allowedVersion = '>= 1.0.0-beta.5 < 2.0.0';
+    const swPackageJson = fs.readFileSync(`${swModule}/package.json`).toString();
+    const swVersion = JSON.parse(swPackageJson)['version'];
+    if (!semver.satisfies(swVersion, allowedVersion)) {
+      throw new Error(stripIndent`
+        The installed version of @angular/service-worker is ${swVersion}. This version of the CLI
+        requires the @angular/service-worker version to satisfy ${allowedVersion}. Please upgrade
+        your service worker version.
       `);
     }
 
@@ -45,7 +57,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }
 
     extraPlugins.push(new GlobCopyWebpackPlugin({
-      patterns: ['ngsw-manifest.json'],
+      patterns: ['ngsw-manifest.json', 'src/ngsw-manifest.json'],
       globOptions: {
         optional: true,
       },
@@ -54,7 +66,9 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     // Load the Webpack plugin for manifest generation and install it.
     const AngularServiceWorkerPlugin = require('@angular/service-worker/build/webpack')
         .AngularServiceWorkerPlugin;
-    extraPlugins.push(new AngularServiceWorkerPlugin());
+    extraPlugins.push(new AngularServiceWorkerPlugin({
+      baseHref: buildOptions.baseHref || '/',
+    }));
 
     // Copy the worker script into assets.
     const workerContents = fs.readFileSync(workerPath).toString();
@@ -71,16 +85,11 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
+      new (<any>webpack).HashedModuleIdsPlugin(),
       new webpack.optimize.UglifyJsPlugin(<any>{
         mangle: { screw_ie8: true },
         compress: { screw_ie8: true, warnings: buildOptions.verbose },
-        sourceMap: buildOptions.sourcemap
-      }),
-      new CompressionPlugin({
-        asset: '[path].gz[query]',
-        algorithm: 'gzip',
-        test: /\.js$|\.html$|\.css$/,
-        threshold: 10240
+        sourceMap: buildOptions.sourcemaps
       })
     ].concat(extraPlugins)
   };

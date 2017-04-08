@@ -74,9 +74,13 @@ export class CliConfig<JsonType> {
       ? ts.sys.readFile(configPath)
       : '{}';
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
-    const otherContents = otherPath
-      .map(path => fs.existsSync(path) && ts.sys.readFile(path))
-      .filter(content => !!content);
+
+    let otherContents = new Array<string>();
+    if (configPath !== otherPath[0]) {
+      otherContents = otherPath
+        .map(path => fs.existsSync(path) && ts.sys.readFile(path))
+        .filter(content => !!content);
+    }
 
     let content: T;
     let schema: Object;
@@ -86,7 +90,7 @@ export class CliConfig<JsonType> {
       content = JSON.parse(configContent);
     } catch (err) {
       throw new InvalidConfigError(
-        'Parsing angular-cli.json failed. Please make sure your angular-cli.json'
+        'Parsing .angular-cli.json failed. Please make sure your .angular-cli.json'
         + ' is valid JSON. Error:\n' + err
       );
     }

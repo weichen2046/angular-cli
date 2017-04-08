@@ -51,7 +51,13 @@ function _getSchemaNodeForPath<T>(rootMetaData: SchemaTreeNode<T>,
   let fragments = _parseJsonPath(path);
   // TODO: make this work with union (oneOf) schemas
   return fragments.reduce((md: SchemaTreeNode<any>, current: string) => {
-    return md && md.children && md.children[current];
+    if (md && md.children) {
+      return md.children[current];
+    } else if (md && md.items) {
+      return md.items[parseInt(current, 10)];
+    } else {
+      return md;
+    }
   }, rootMetaData);
 }
 
@@ -72,7 +78,7 @@ export interface SchemaClass<JsonType> extends Object {
   // Direct access to the schema.
   $$schema(): RootSchemaTreeNode;
 
-  $$serialize(mimetype?: string): string;
+  $$serialize(mimetype?: string, ...args: any[]): string;
 }
 
 
@@ -96,6 +102,9 @@ class SchemaClassBase<T> implements SchemaClass<T> {
   /** Sets the value of a destination if the value is currently undefined. */
   $$alias(source: string, destination: string) {
     let sourceSchemaTreeNode = _getSchemaNodeForPath(this.$$schema(), source);
+    if (!sourceSchemaTreeNode) {
+      return false;
+    }
 
     const fragments = _parseJsonPath(destination);
     const maybeValue = fragments.reduce((value: any, current: string) => {

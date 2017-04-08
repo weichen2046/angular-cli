@@ -6,4 +6,22 @@
 `ng generate class [name]` generates a class
 
 ## Options
-`--spec` specifies if a spec file is generated
+<details>
+  <summary>app</summary>
+  <p>
+    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+  </p>
+  <p>
+    Specifies app name to use.
+  </p>
+</details>
+
+<details>
+  <summary>spec</summary>
+  <p>
+    <code>--spec</code>
+  </p>
+  <p>
+    Specifies if a spec file is generated.
+  </p>
+</details>

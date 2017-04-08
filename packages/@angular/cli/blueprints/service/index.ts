@@ -1,10 +1,12 @@
-import {NodeHost} from '../../lib/ast-tools';
+import * as chalk from 'chalk';
+import * as path from 'path';
 import { oneLine } from 'common-tags';
+import { NodeHost } from '../../lib/ast-tools';
+import { CliConfig } from '../../models/config';
+import { dynamicPathParser } from '../../utilities/dynamic-path-parser';
+import { getAppFromConfig } from '../../utilities/app-utils';
+import { resolveModulePath } from '../../utilities/resolve-module-file';
 
-const path = require('path');
-const fs = require('fs');
-const chalk = require('chalk');
-const dynamicPathParser = require('../../utilities/dynamic-path-parser');
 const Blueprint = require('../../ember-cli/lib/models/blueprint');
 const stringUtils = require('ember-cli-string-utils');
 const astUtils = require('../../utilities/ast-utils');
@@ -12,37 +14,54 @@ const getFiles = Blueprint.prototype.files;
 
 export default Blueprint.extend({
   description: '',
+  aliases: ['s'],
 
   availableOptions: [
-    { name: 'flat', type: Boolean, default: true },
-    { name: 'spec', type: Boolean },
-    { name: 'module', type: String, aliases: ['m'] }
+    {
+      name: 'flat',
+      type: Boolean,
+      description: 'Flag to indicate if a dir is created.'
+    },
+    {
+      name: 'spec',
+      type: Boolean,
+      description: 'Specifies if a spec file is generated.'
+    },
+    {
+      name: 'module',
+      type: String, aliases: ['m'],
+      description: 'Specifies where the service should be provided.'
+    },
+    {
+      name: 'app',
+      type: String,
+      aliases: ['a'],
+      description: 'Specifies app name to use.'
+    }
   ],
 
-  beforeInstall: function(options: any) {
+  beforeInstall: function (options: any) {
     if (options.module) {
-      // Resolve path to module
-      const modulePath = options.module.endsWith('.ts') ? options.module : `${options.module}.ts`;
-      const parsedPath = dynamicPathParser(this.project, modulePath);
-      this.pathToModule = path.join(this.project.root, parsedPath.dir, parsedPath.base);
-
-      if (!fs.existsSync(this.pathToModule)) {
-        throw 'Module specified does not exist';
-      }
+      const appConfig = getAppFromConfig(this.options.app);
+      this.pathToModule =
+        resolveModulePath(options.module, this.project, this.project.root, appConfig);
     }
   },
 
   normalizeEntityName: function (entityName: string) {
-    const parsedPath = dynamicPathParser(this.project, entityName);
+    const appConfig = getAppFromConfig(this.options.app);
+    const parsedPath = dynamicPathParser(this.project, entityName, appConfig);
 
     this.dynamicPath = parsedPath;
     return parsedPath.name;
   },
 
   locals: function (options: any) {
+    options.flat = options.flat !== undefined ?
+      options.flat : CliConfig.getValue('defaults.service.flat');
+
     options.spec = options.spec !== undefined ?
-      options.spec :
-      this.project.ngConfigObj.get('defaults.spec.service');
+      options.spec : CliConfig.getValue('defaults.service.spec');
 
     return {
       dynamicPath: this.dynamicPath.dir,
@@ -50,7 +69,7 @@ export default Blueprint.extend({
     };
   },
 
-  files: function() {
+  files: function () {
     let fileList = getFiles.call(this) as Array<string>;
 
     if (this.options && !this.options.spec) {
@@ -94,8 +113,8 @@ export default Blueprint.extend({
         astUtils.addProviderToModule(this.pathToModule, className, importPath)
           .then((change: any) => change.apply(NodeHost)));
       this._writeStatusToUI(chalk.yellow,
-                            'update',
-                            path.relative(this.project.root, this.pathToModule));
+        'update',
+        path.relative(this.project.root, this.pathToModule));
     }
 
     return Promise.all(returns);

@@ -12,7 +12,7 @@ export interface TranspileOutput {
 }
 
 
-function resolve(filePath: string, host: ts.CompilerHost, program: ts.Program) {
+function resolve(filePath: string, _host: ts.CompilerHost, program: ts.Program) {
   if (path.isAbsolute(filePath)) {
     return filePath;
   }
@@ -37,7 +37,7 @@ export class TypeScriptFileRefactor {
   get sourceText() { return this._sourceString.toString(); }
 
   constructor(fileName: string,
-              private _host: ts.CompilerHost,
+              _host: ts.CompilerHost,
               private _program?: ts.Program) {
     fileName = resolve(fileName, _host, _program).replace(/\\/g, '/');
     this._fileName = fileName;
@@ -45,9 +45,8 @@ export class TypeScriptFileRefactor {
       this._sourceFile = _program.getSourceFile(fileName);
     }
     if (!this._sourceFile) {
-      this._program = null;
       this._sourceFile = ts.createSourceFile(fileName, _host.readFile(fileName),
-        ts.ScriptTarget.Latest);
+        ts.ScriptTarget.Latest, true);
     }
     this._sourceText = this._sourceFile.getFullText(this._sourceFile);
     this._sourceString = new MagicString(this._sourceText);
